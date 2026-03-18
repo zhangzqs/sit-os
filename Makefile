@@ -6,6 +6,11 @@ all: build_prepare ${ELF_TARGET}
 
 ${TARGET}.elf: ${OBJS}
 	${CC} ${CFLAGS} ${INCS} -T ${LINKER_SCEIPT} -o ${ELF_TARGET} $^
+	@start_addr="$$( ${OBJDUMP} -t ${ELF_TARGET} | awk '$$NF == "_start" { print $$1; exit }' )"; \
+	if [ "$$start_addr" != "80000000" ]; then \
+		echo "[ERROR] _start must be linked at 0x80000000, got $${start_addr:-<missing>}"; \
+		exit 1; \
+	fi
 	${OBJCOPY} -O binary ${ELF_TARGET} ${BIN_TARGET}
 
 ${OBJ_PATH}/%.o: ${SOURCE_PATH}/asm/%.S
@@ -49,4 +54,3 @@ dis: ${DISASMS}
 .PHONY : clean
 clean:
 	rm -rf build/
-

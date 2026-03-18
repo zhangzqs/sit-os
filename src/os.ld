@@ -27,6 +27,8 @@ SECTIONS
 	.text : {
 		/* 类似于赋值命令，最终将数值会放在链接结果的符号表中 _text_start 字段 */
 		PROVIDE(_text_start = .);
+		/* QEMU boot ROM jumps to 0x80000000, so start.o must stay first. */
+		*/start.o(.text .text.*)
 		*(.text .text.*)
 		PROVIDE(_text_end = .);
 	} >ram
